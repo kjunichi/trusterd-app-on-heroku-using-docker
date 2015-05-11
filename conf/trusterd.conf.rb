@@ -29,7 +29,7 @@ SERVER_NAME = "Trusterd"
 SERVER_VERSION = "0.0.1"
 SERVER_DESCRIPTION = "#{SERVER_NAME}/#{SERVER_VERSION}"
 
-root_dir = "/usr/local/trusterd"
+root_dir = "/app/trusterd"
 
 s = HTTP2::Server.new({
 
@@ -38,21 +38,21 @@ s = HTTP2::Server.new({
   #
 
   :port           => 8080,
-  :document_root  => "#{root_dir}/htdocs",
+  :document_root  => "/app/src/htdocs",
   :server_name    => SERVER_DESCRIPTION,
 
   # support prefork only when linux kernel supports SO_REUSEPORT
   # :worker         => 4,
-  :worker         => "auto",
+  :worker         => 1,
 
   # required when tls option is true.
   # tls option is true by default.
-  :key            => "#{root_dir}/conf/server.key",
-  :crt            => "#{root_dir}/conf/server.crt",
+  :key            => "/app/src/conf/server.key",
+  :crt            => "/app/src/conf/server.crt",
 
   # listen ip address
   # default value is 0.0.0.0
-  # :server_host  => "127.0.0.1",
+  :server_host  => "127.0.0.1",
 
   #
   # optional config
@@ -68,13 +68,13 @@ s = HTTP2::Server.new({
   # :daemon => true,
 
   # callback default: false
-  # :callback => true,
+  :callback => true,
 
   # connection_record defualt: true
   # :connection_record => false,
 
   # runngin user, start server with root and change to run_user
-  :run_user => "nobody",
+  #:run_user => "app",
 
   # Tuning RLIMIT_NOFILE, start server with root and must set run_user instead of root
   # :rlimit_nofile => 65535,
@@ -99,16 +99,16 @@ s = HTTP2::Server.new({
 #
 # when :callback option is true,
 #
-# s.set_map_to_storage_cb {
+s.set_map_to_storage_cb {
 #
 #   p "callback bloack at set_map_to_storage_cb"
 #   p s.request.uri
 #   p s.request.filename
 #
 #   # location setting
-#   if s.request.uri == "/index.html"
-#     s.request.filename = "#{root_dir}/htdocs/hoge"
-#   end
+   if s.request.uri == "/"
+      s.request.filename = "/app/src/htdocs/index.html"
+    end
 #   p s.request.filename
 #
 #   # you can use regexp if you link regexp mrbgem.
@@ -125,9 +125,11 @@ s = HTTP2::Server.new({
 #   end
 #
 #   # dynamic content with mruby
-#   if s.request.filename =~ /^.*\.rb$/
-#     s.enable_mruby
-#   end
+    if s.request.filename =~ /^.*\.rb$/
+      s.enable_mruby
+      s.response_headers["content-type"]="text/plain; charset=utf-8"
+    end
+
 #
 #   # dynamic content with mruby sharing mrb_state
 #   if s.request.filename =~ /^.*\_shared.rb$/
@@ -136,7 +138,7 @@ s = HTTP2::Server.new({
 
 #
 #
-# }
+}
 
 # s.set_content_cb {
 #   s.rputs "hello trusterd world from cb"
@@ -154,4 +156,3 @@ s = HTTP2::Server.new({
 # }
 
 s.run
-
