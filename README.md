@@ -12,6 +12,10 @@ cd trusterd-app-on-heroku-using-docker/
 heroku docker:start
 ```
 
+## How to response in mruby
+
+When you add mruby script( ex. hoge.rb) to htdocs folder,you can get response by accsess to /hoge.rb.
+
 ## configuration files
 
 ### conf/trusterd.conf.rb
